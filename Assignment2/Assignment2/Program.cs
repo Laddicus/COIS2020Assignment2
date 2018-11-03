@@ -58,8 +58,11 @@ namespace Assignment2
 
         class Huffman
         {
+            private int count = 0;
+            
             private Node HT; // Huffman tree to create codes and decode text
-            private Dictionary<Char, string> D; // Dictionary to encode text
+            private Node temp; // Huffman tree to create codes and decode text
+            private Dictionary<Char, string> D = new Dictionary<char, string>(); // Dictionary to encode text
 
             private Dictionary<Char, int> F = new Dictionary<char, int>(); // Dictionary to store frequency
 
@@ -67,11 +70,12 @@ namespace Assignment2
             public Huffman(string S)
             {
                 AnalyzeText(S);
-                foreach (KeyValuePair<Char,int> kvp in F)
-                {
-                    Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-                }
                 Build(F);
+                CreateCodes(HT, "");
+                string encoded = Encode(S);
+                Console.WriteLine(encoded);
+                string decoded = Decode(encoded);
+                Console.WriteLine(decoded);
                 Console.ReadKey();
             }
 
@@ -109,7 +113,7 @@ namespace Assignment2
 
                 N.Sort();
                 
-                for (int i = 0; i < N.Count; i+=2)
+                for (int i = 0; i < N.Count - 1; i+=2)
                 {
                     if (N[i + 1] != null)
                     {
@@ -121,9 +125,10 @@ namespace Assignment2
                         PQ.Add(N[i]);
                     }
                 }
-                //while (N.Count >= PQ.Count)
-                {
-                    PQ.Sort();
+                
+                
+                PQ.Sort();
+                //PQ.Reverse();
                 for (int j = 0; j < N.Count-2; j+=2)
                 {
                     if (j + 1 <= PQ.Count-1)
@@ -131,7 +136,7 @@ namespace Assignment2
                         OL = new Node('|', PQ[j].Frequency+PQ[j+1].Frequency, PQ[j], PQ[j + 1]);
                         PQ.Add(OL);
                         PQ.Sort();
-                            //PQ.Reverse();
+                        //PQ.Reverse();
                     }
                     else
                     {
@@ -141,27 +146,72 @@ namespace Assignment2
                             //PQ.Reverse();
                     }
                 }
-                }
-                HT = PQ[PQ.Count - 1];
+                
+                HT = PQ[PQ.Count -1];
             }
 
             // Create the code of 0s and 1s for each character by traversing the Huffman tree (invoked by Huffman)
-            private void CreateCodes()
+            private void CreateCodes(Node root, string code)
             {
-                
+                count++;
+                if(root.Left== null && root.Right== null)
+                {
+                    //This is a leaf node; print its value
+                    try
+                    {
+                    D.Add(root.Character, code);
+                    }
+                    catch
+                    {
+
+                    }
+                    //code = "";
+                }
+                else
+                {
+                    //Recurse on left subtree
+                    if(root.Left!= null) {
+                        CreateCodes(root.Left, code+"0");
+                    }
+                    //Recurse on right subtree
+                    if(root.Right!= null)
+                    {
+                        CreateCodes(root.Right, code+"1");
+                    }
+                }
             }
 
             // Encode the given text and return a string of 0s and 1s
-            //public string Encode(string S)
-            //{
+            public string Encode(string S)
+            {
+                char[] C = S.ToCharArray();
+                string encoded = "";
 
-            //}
+                foreach (char c in C)
+                {
+                    encoded += D[c];
+                }
+                return encoded;
+            }
 
-            //// Decode the given string of 0s and 1s and return the original text
-            //public string Decode(string S)
-            //{
+            // Decode the given string of 0s and 1s and return the original text
+            public string Decode(string S)
+            {
+                string temp = "";
+                char[] C = S.ToCharArray();
+                string decoded = "";
 
-            //}
+                foreach (char c in C)
+                {
+                    temp += c;
+                    if (D.ContainsValue(temp))
+                    {
+                        decoded += D.FirstOrDefault(x => x.Value == temp).Key;
+                        temp = "";
+                    }
+                }
+                return decoded;
+            }
 
         }
 
@@ -171,7 +221,7 @@ namespace Assignment2
             Console.WriteLine("Please insert a phrase to be encoded");
             string input = Console.ReadLine();
             
-            new Huffman("green eggs and ham");
+            new Huffman(input);
         }
     }
 }
