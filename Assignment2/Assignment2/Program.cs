@@ -113,37 +113,38 @@ namespace Assignment2
 
                 N.Sort();
                 
-                for (int i = 0; i < N.Count - 1; i+=2)
+                while(N.Count != 0)
                 {
-                    if (N[i + 1] != null)
+                    if (N.Count > 1)
                     {
-                        NL = new Node('|', N[i].Frequency+N[i+1].Frequency, N[i], N[i + 1]);
+                        NL = new Node('|', N[0].Frequency+N[1].Frequency, N[0], N[1]);
                         PQ.Add(NL);
+                        N.Remove(N[0]);
+                        N.Remove(N[0]);
                     }
                     else
                     {
-                        PQ.Add(N[i]);
+                        PQ.Add(N[0]);
+                        N.Remove(N[0]);
                     }
+
                 }
                 
                 
                 PQ.Sort();
-                //PQ.Reverse();
-                for (int j = 0; j < N.Count-2; j+=2)
+                // pairs all the lowest frequency chars together first and builds whole tree
                 {
                     if (j + 1 <= PQ.Count-1)
                     {
                         OL = new Node('|', PQ[j].Frequency+PQ[j+1].Frequency, PQ[j], PQ[j + 1]);
                         PQ.Add(OL);
                         PQ.Sort();
-                        //PQ.Reverse();
                     }
                     else
                     {
-                            OL = new Node('|', PQ[j].Frequency + PQ[PQ.Count-1].Frequency, PQ[j], PQ[PQ.Count-1]);
-                            PQ.Add(OL);
-                            PQ.Sort();
-                            //PQ.Reverse();
+                        OL = new Node('|', PQ[j].Frequency + PQ[PQ.Count-1].Frequency, PQ[j], PQ[PQ.Count-1]);
+                        PQ.Add(OL);
+                        PQ.Sort();
                     }
                 }
                 
@@ -165,7 +166,6 @@ namespace Assignment2
                     {
 
                     }
-                    //code = "";
                 }
                 else
                 {
