@@ -133,6 +133,7 @@ namespace Assignment2
                 
                 PQ.Sort();
                 // pairs all the lowest frequency chars together first and builds whole tree
+                for (int j = 0; j < F.Count; j+=2)
                 {
                     if (j + 1 <= PQ.Count-1)
                     {
