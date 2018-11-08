@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PriorityQueue;
 
 namespace Assignment2
 {
@@ -51,9 +52,6 @@ namespace Assignment2
                 else
                     return 1;
             }
-
-            
-                
         }
 
         class Huffman
@@ -61,9 +59,7 @@ namespace Assignment2
             private int count = 0;
             
             private Node HT; // Huffman tree to create codes and decode text
-            private Node temp; // Huffman tree to create codes and decode text
             private Dictionary<Char, string> D = new Dictionary<char, string>(); // Dictionary to encode text
-
             private Dictionary<Char, int> F = new Dictionary<char, int>(); // Dictionary to store frequency
 
             // Constructor
@@ -76,7 +72,6 @@ namespace Assignment2
                 Console.WriteLine(encoded);
                 string decoded = Decode(encoded);
                 Console.WriteLine(decoded);
-                Console.ReadKey();
             }
 
             // Return the frequency of each character in the given text (invoked by Huffman)
@@ -99,79 +94,64 @@ namespace Assignment2
             //// Build a Huffman tree based on the character frequencies greater than 0 (invoked by Huffman)
             private void Build(Dictionary<char, int> F)
             {
-                Node test;
-                Node NL;
-                Node OL;
+                PriorityQueue<Node> PQ = new PriorityQueue<Node>(F.Count) ;
+                PriorityQueue<Node> N = new PriorityQueue<Node>(F.Count) ;
                 
-                List<Node> PQ = new List<Node>();
-                List<Node> N = new List<Node>();
                 foreach (KeyValuePair<Char,int> kvp in F)
                 {
+                    Node test;
                     test = new Node(kvp.Key, kvp.Value, null, null);
                     N.Add(test);
                 }
 
-                N.Sort();
                 
-                while(N.Count != 0)
+                while(N.Size() != 0)
                 {
-                    if (N.Count > 1)
+                    if (N.Size() > 1)
                     {
-                        NL = new Node('|', N[0].Frequency+N[1].Frequency, N[0], N[1]);
-                        PQ.Add(NL);
-                        N.Remove(N[0]);
-                        N.Remove(N[0]);
+                        Node temp1 = N.Front();
+                        N.Remove();
+                        Node temp2 = N.Front();
+                        N.Remove();
+                        PQ.Add(new Node(' ', temp1.Frequency + temp2.Frequency, temp1, temp2));
                     }
                     else
                     {
-                        PQ.Add(N[0]);
-                        N.Remove(N[0]);
+                        PQ.Add(N.Front());
+                        PQ.Remove();
                     }
+                }
+                
+                // pairs all the lowest frequency chars together first and builds whole tree
+                while (PQ.Size() > 1)
+                {
+                    Node temp1 = PQ.Front();
+                    PQ.Remove();
+                    Node temp2= PQ.Front();
+                    PQ.Remove();
+                    PQ.Add(new Node(' ', temp1.Frequency+temp2.Frequency, temp1, temp2));
 
                 }
-                
-                
-                PQ.Sort();
-                // pairs all the lowest frequency chars together first and builds whole tree
-                for (int j = 0; j < F.Count; j+=2)
-                {
-                    if (j + 1 <= PQ.Count-1)
-                    {
-                        OL = new Node('|', PQ[j].Frequency+PQ[j+1].Frequency, PQ[j], PQ[j + 1]);
-                        PQ.Add(OL);
-                        PQ.Sort();
-                    }
-                    else
-                    {
-                        OL = new Node('|', PQ[j].Frequency + PQ[PQ.Count-1].Frequency, PQ[j], PQ[PQ.Count-1]);
-                        PQ.Add(OL);
-                        PQ.Sort();
-                    }
-                }
-                
-                HT = PQ[PQ.Count -1];
+                // Set HT to the node with the largest frequency/the root node
+                HT = PQ.Front();
             }
 
             // Create the code of 0s and 1s for each character by traversing the Huffman tree (invoked by Huffman)
             private void CreateCodes(Node root, string code)
             {
-                count++;
-                if(root.Left== null && root.Right== null)
+                if (F.Count == 1) // If there is only one character in the message
                 {
-                    //This is a leaf node; print its value
-                    try
-                    {
-                    D.Add(root.Character, code);
-                    }
-                    catch
-                    {
-
-                    }
+                    D.Add(root.Character, "0");
                 }
-                else
+                else if(root.Left== null && root.Right== null) // This is a leaf node
+                {
+                    D.Add(root.Character, code);
+                }
+                else // Not a leaf node
                 {
                     //Recurse on left subtree
-                    if(root.Left!= null) {
+                    if(root.Left!= null)
+                    {
                         CreateCodes(root.Left, code+"0");
                     }
                     //Recurse on right subtree
@@ -189,9 +169,7 @@ namespace Assignment2
                 string encoded = "";
 
                 foreach (char c in C)
-                {
                     encoded += D[c];
-                }
                 return encoded;
             }
 
@@ -218,11 +196,26 @@ namespace Assignment2
 
         static void Main()
         {
-            // request string
-            Console.WriteLine("Please insert a phrase to be encoded");
-            string input = Console.ReadLine();
-            
-            new Huffman(input);
+            bool exit = false;
+            while (!exit)
+            {
+                // request string
+                Console.WriteLine("Please insert a phrase to be encoded");
+                string input = Console.ReadLine();
+                if (input == "")
+                {
+                }
+                else
+                {
+                    new Huffman(input);
+                }
+                Console.WriteLine("Would you like to continue y/n?");
+                if (Console.ReadKey().Key == ConsoleKey.N)
+                {
+                    exit = true;
+                }
+                Console.WriteLine("\n");
+            }
         }
     }
 }
