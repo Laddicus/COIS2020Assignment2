@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PriorityQueue;
+using PriorityQueue; // Using provided Priority Queue
 
 namespace Assignment2
 {
@@ -30,7 +30,7 @@ namespace Assignment2
                 Node n = obj as Node;
                 if (Frequency < n.Frequency)
                     return -1;
-                else if (Frequency == n.Frequency)
+                else if (Frequency == n.Frequency) // If the frequency is the same, compare the ACII code
                 {
                     if(Left!=null && n.Left!=null)
                     {
@@ -56,8 +56,6 @@ namespace Assignment2
 
         class Huffman
         {
-            private int count = 0;
-            
             private Node HT; // Huffman tree to create codes and decode text
             private Dictionary<Char, string> D = new Dictionary<char, string>(); // Dictionary to encode text
             private Dictionary<Char, int> F = new Dictionary<char, int>(); // Dictionary to store frequency
@@ -84,19 +82,20 @@ namespace Assignment2
                     {
                         F.Add(c, 1);
                     }
-                    catch
+                    catch // If the character is already in the dictionary, increase the frequency
                     {
                         F[c] = F[c] + 1;
                     }
                 }
             }
 
-            //// Build a Huffman tree based on the character frequencies greater than 0 (invoked by Huffman)
+            // Build a Huffman tree based on the character frequencies greater than 0 (invoked by Huffman)
             private void Build(Dictionary<char, int> F)
             {
                 PriorityQueue<Node> PQ = new PriorityQueue<Node>(F.Count) ;
                 PriorityQueue<Node> N = new PriorityQueue<Node>(F.Count) ;
                 
+                // Middle step to stage characters as nodes
                 foreach (KeyValuePair<Char,int> kvp in F)
                 {
                     Node test;
@@ -104,7 +103,7 @@ namespace Assignment2
                     N.Add(test);
                 }
 
-                
+                // Adding those characters into the working queue
                 while(N.Size() != 0)
                 {
                     if (N.Size() > 1)
@@ -118,7 +117,7 @@ namespace Assignment2
                     else
                     {
                         PQ.Add(N.Front());
-                        PQ.Remove();
+                        N.Remove();
                     }
                 }
                 
@@ -209,8 +208,8 @@ namespace Assignment2
                 {
                     new Huffman(input);
                 }
-                Console.WriteLine("Would you like to continue y/n?");
-                if (Console.ReadKey().Key == ConsoleKey.N)
+                Console.WriteLine("Press ESC to exit and any key to continue.");
+                if (Console.ReadKey().Key == ConsoleKey.Escape)
                 {
                     exit = true;
                 }
